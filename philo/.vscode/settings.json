@@ -1,0 +1,8 @@
+{
+	"files.associations": {
+		"time.h": "c",
+		"stdio.h": "c",
+		"stdlib.h": "c",
+		"limits.h": "c"
+	}
+}
