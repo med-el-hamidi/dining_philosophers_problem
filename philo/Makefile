@@ -1,26 +1,24 @@
 NAME := philo
 
 CC := cc
-CFLGS := -Wall -Wextra -Werror -fsanitize=address
+CFLGS := -Wall -Wextra -Werror -fsanitize=thread
 RM := rm -f
 
-HEADERS := philo_macros.h philo.h
-SRCS :=	error.c\
-		input.c \
-		input_utils.c \
-		utils.c \
+HEADER := philo.h
+SRCS :=	input.c \
 		init.c \
-		monitor.c \
 		philo.c \
-		cleanup.c \
+		monitor.c \
+		free.c \
+		utils.c \
 		main.c
 
 OBJCS := $(SRCS:.c=.o)
 
 $(NAME): $(OBJCS)
-	$(CC) $(CFLGS) -g -pthread $^ -o $@
+	$(CC) $(CFLGS) -pthread $^ -o $@
 
-%.o:%.c $(HEADERS)
+%.o:%.c $(HEADER)
 	$(CC) $(CFLGS) -c $< -o $@
 
 all: $(NAME)
