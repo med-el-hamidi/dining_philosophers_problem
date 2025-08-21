@@ -1,6 +1,20 @@
 #include "philo.h"
 
-#include "philo.h"
+/* ft_print_error:
+*	Prints errors into stderr.
+*/
+void	ft_print_error(char *s)
+{
+	size_t	i;
+
+	if (!s)
+		return ;
+	i = 0;
+	while (s[i])
+		i++;
+	write(STDERR_FILENO, s, i);
+	write(STDERR_FILENO, "\n", 1);
+}
 
 /* get_time_ms:
 *	Gets the current time in miliseconds since the Epoch (1970-01-01 00:00:00).
@@ -57,6 +71,6 @@ void print_status(t_philo *philo, char *status, int monitored)
 		pthread_mutex_unlock(&philo->data->print_mutex);
 		return ;
 	}
-	printf("%ld %d %s ---->%d\n", (get_time_ms() - philo->data->start_time), philo->id + 1, status, philo->meals_eaten);
+	printf("%ld %d %s\n", (get_time_ms() - philo->data->start_time), philo->id + 1, status);
 	pthread_mutex_unlock(&philo->data->print_mutex);
 }

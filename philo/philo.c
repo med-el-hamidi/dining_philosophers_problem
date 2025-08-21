@@ -72,7 +72,7 @@ void *philo_routine(void *arg)
 	t_philo *philo;
 
 	philo = (t_philo *)arg;
-	if (!philo || !philo->data->meals_required || !philo->data->time_to_die)
+	if (!philo || !philo->data || !philo->data->meals_required || !philo->data->time_to_die)
 		return (NULL);
 	pthread_mutex_lock(&philo->meal_time_mutex);
 	philo->last_meal = philo->data->start_time;

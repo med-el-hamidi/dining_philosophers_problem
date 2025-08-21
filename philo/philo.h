@@ -49,34 +49,30 @@ typedef struct s_data
 	t_philo			*philos;
 }	t_data;
 
-// error.c
-//void		error_msg(char *msg, char *msg_arg);
+//	free.c
+void	destroy_mutexes(t_data *data);
+void	free_data(t_data *data);
 
-//free.c
-void		destroy_mutexes(t_data *data);
-void		free_data(t_data *data);
+//	input.c
+int		custom_atoi(const char *str);
+int		parse_input(int ac, char **av);
 
-// input_utils.c
-void		ft_putstr_fd(char *str, int fd);
+//	utils.c
+void	ft_print_error(char *s);
+time_t	get_time_ms(void);
+void	philo_sleep(t_data *data, time_t sleep_time);
+void	start_delay(time_t start_time);
+void	print_status(t_philo *philo, char *status, int momitored);
 
-// input.c
-int			custom_atoi(const char *str);
-int			parse_input(int ac, char **av);
+//	init.c
+int		init_all(t_data *data, int argc, char **argv);
 
-// utils.c
-time_t		get_time_ms(void);
-void		philo_sleep(t_data *data, time_t sleep_time);
-void		start_delay(time_t start_time);
-void		print_status(t_philo *philo, char *status, int momitored);
+//	philo.c
+void	*philo_routine(void *arg);
 
-// init.c
-int			init_all(t_data *data, int argc, char **argv);
-
-// philo.c
-void		*philo_routine(void *arg);
-
-// monitor.c
-int			has_simulation_stopped(t_data *data);
-void		*monitor_routine(void *arg);
+//	monitor.c
+void	set_stop_flag(t_data *data, int state);
+int		has_simulation_stopped(t_data *data);
+void	*monitor_routine(void *arg);
 
 #endif

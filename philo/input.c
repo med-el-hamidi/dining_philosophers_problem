@@ -60,7 +60,7 @@ int	parse_input(int ac, char **av)
 			return (printf(ERR_INPUT_DIGIT, av[i]), 0);
 		nbr = custom_atoi(av[i]);
 		if (i == 1 && nbr <= 0)
-			return (printf(ERR_INPUT_PHILO), 0);
+			return (ft_print_error(ERR_INPUT_PHILO), 0);
 		else if (i != 1 && nbr == -1)
 			return (printf(ERR_INPUT_DIGIT, av[i]), 0);
 	}

@@ -8,18 +8,31 @@ static int	init_mutexes(t_data *data)
 		return (0);
 	data->forks = malloc(sizeof(pthread_mutex_t) * data->num_philos);
 	if (!data->forks)
-		return (printf(ERR_MALLOC), 0);
+		return (ft_print_error(ERR_MALLOC), 0);
 	i = 0;
 	while (i < data->num_philos)
 	{
 		if (pthread_mutex_init(&data->forks[i], NULL) != 0)
-			return (printf(ERR_MUTEX), 0);
+		{
+			while (i--)
+				pthread_mutex_destroy(&data->forks[i]);
+			return (ft_print_error(ERR_MUTEX), 0);
+		}
 		i++;
 	}
 	if (pthread_mutex_init(&data->print_mutex, NULL) != 0)
-		return (printf(ERR_MUTEX), 0);
+	{
+		while (i--)
+			pthread_mutex_destroy(&data->forks[i]);
+		return (ft_print_error(ERR_MUTEX), 0);
+	}
 	if (pthread_mutex_init(&data->death_mutex, NULL) != 0)
-		return (printf(ERR_MUTEX), 0);
+	{
+		while (i--)
+			pthread_mutex_destroy(&data->forks[i]);
+		pthread_mutex_destroy(&data->print_mutex);
+		return (ft_print_error(ERR_MUTEX), 0);
+	}
 	return (1);
 }
 
@@ -31,7 +44,7 @@ static int	init_philos(t_data *data)
 		return (0);
 	data->philos = malloc(sizeof(t_philo) * data->num_philos);
 	if (!data->philos)
-		return (printf(ERR_MALLOC), 0);
+		return (ft_print_error(ERR_MALLOC), 0);
 	i = 0;
 	while (i < data->num_philos)
 	{
@@ -49,7 +62,7 @@ static int	init_philos(t_data *data)
 			data->philos[i].right_fork = &data->forks[(i + 1) % data->num_philos];
 		}
 		if (pthread_mutex_init(&data->philos[i].meal_time_mutex, NULL) != 0)
-			return (printf(ERR_MUTEX), 0);
+			return (free(data->philos), ft_print_error(ERR_MUTEX), 0);
 		i++;
 	}
 	return (1);
@@ -69,8 +82,8 @@ int	init_all(t_data *data, int ac, char **av)
 		data->meals_required = -1;
 	data->stop = 0;
 	if (!init_mutexes(data))
-		return (free_data(data), 0);
+		return (0);
 	if (!init_philos(data))
-		return (destroy_mutexes(data), free_data(data), 0);
+		return (destroy_mutexes(data), 0);
 	return (1);
 }

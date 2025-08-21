@@ -5,7 +5,7 @@
 *	thread can set this flag. If the simulation stop flag is
 *	set to 1, that means the simulation has met an end condition.
 */
-static void	set_stop_flag(t_data *data, int state)
+void	set_stop_flag(t_data *data, int state)
 {
 	pthread_mutex_lock(&data->death_mutex);
 		data->stop = state;
