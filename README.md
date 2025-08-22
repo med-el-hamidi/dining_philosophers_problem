@@ -50,6 +50,7 @@ Usage
 ./philo number_of_philos time_to_die time_to_eat time_to_sleep [meals_required]
 ```
 Arguments
+
 number_of_philos — number of philosophers (and forks)
 
 time_to_die — ms before a philosopher dies without starting to eat
