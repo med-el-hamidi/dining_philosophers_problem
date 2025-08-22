@@ -4,6 +4,24 @@ static void	cleanup_error_case(t_data *data, int i);
 static int	start(t_data *data);
 static void	stop(t_data *data);
 
+/* main:
+ *  Entry point of the philosopher simulation.
+ *   - Expects 4 or 5 arguments:
+ *       1) number_of_philosophers
+ *       2) time_to_die
+ *       3) time_to_eat
+ *       4) time_to_sleep
+ *       5) [optional] meals_required
+ *
+ *  Steps:
+ *   1. Validate argument count
+ *   2. Parse and validate input values
+ *   3. Initialize data structures and mutexes
+ *   4. Start the simulation
+ *   5. Stop simulation and clean up resources
+ *
+ *  Returns EXIT_SUCCESS on success, EXIT_FAILURE on error.
+ */
 int	main(int ac, char *av[])
 {
 	t_data	data;
@@ -44,7 +62,7 @@ static int	start(t_data *data)
 {
 	int	i;
 
-	if (!data)
+	if (!data || !data->philos)
 		return (0);
 	data->start_time = get_time_ms() + (data->num_philos * 20);
 	i = 0;
@@ -76,6 +94,8 @@ static void	stop(t_data *data)
 {
 	int	i;
 
+	if (!data || !data->philos)
+		return ;
 	i = 0;
 	while (i < data->num_philos)
 	{

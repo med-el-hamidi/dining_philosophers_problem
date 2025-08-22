@@ -1,5 +1,41 @@
 #include "philo.h"
 
+static void	eat_sleep_routine(t_philo *philo);
+static void	think_routine(t_philo *philo);
+static void	*lone_philo_routine(t_philo *philo);
+
+/* philo_routine:
+ *  Main routine for each philosopher thread.
+ *  - Initializes last_meal time.
+ *  - Handles special case if only one philosopher exists.
+ *  - Otherwise loops: eat → sleep → think, until simulation stops.
+ */
+void *philo_routine(void *arg)
+{
+	t_philo *philo;
+
+	philo = (t_philo *)arg;
+	if (!philo || !philo->data || !philo->data->meals_required || !philo->data->time_to_die)
+		return (NULL);
+	pthread_mutex_lock(&philo->meal_time_mutex);
+	philo->last_meal = philo->data->start_time;
+	pthread_mutex_unlock(&philo->meal_time_mutex);
+	start_delay(philo->data->start_time);
+	if (philo->data->num_philos == 1)
+		return (lone_philo_routine(philo));
+	while (!has_simulation_stopped(philo->data))
+	{
+		eat_sleep_routine(philo);
+		think_routine(philo);
+	}
+    return (NULL);
+}
+
+/* eat_sleep_routine:
+ *  Philosopher picks up both forks, eats, then sleeps.
+ *  - Updates last_meal time and meals_eaten count.
+ *  - Forks are unlocked after eating.
+ */
 static void	eat_sleep_routine(t_philo *philo)
 {
 	pthread_mutex_lock(philo->left_fork);
@@ -24,15 +60,11 @@ static void	eat_sleep_routine(t_philo *philo)
 }
 
 /* think_routine:
-*	Once a philosopher is done sleeping, he will think for a certain
-*	amount of time before starting to eat again.
-*	The time_to_think is calculated depending on how long it has been
-*	since the philosopher's last meal, the time_to_eat and the time_to_die
-*	to determine when the philosopher will be hungry again.
-*	This helps stagger philosopher's eating routines to avoid forks being
-*	needlessly monopolized by one philosopher to the detriment of others.
-*/
-static void	think_routine(t_philo *philo, int print)
+ *  Philosopher thinks for a calculated time before eating again.
+ *  - Thinking time depends on last meal, time_to_eat, and time_to_die.
+ *  - Helps stagger eating so forks are shared fairly.
+ */
+static void	think_routine(t_philo *philo)
 {
 	time_t	time_to_think;
 
@@ -43,20 +75,16 @@ static void	think_routine(t_philo *philo, int print)
 	pthread_mutex_unlock(&philo->meal_time_mutex);
 	if (time_to_think < 0)
 		time_to_think = 0;
-	if (time_to_think == 0 && !print)
-		time_to_think = 1;
 	if (time_to_think > 600)
 		time_to_think = 200;
-	if (print)
-		print_status(philo, "is thinking", 0);
+	print_status(philo, "is thinking", 0);
 	philo_sleep(philo->data, time_to_think);
 }
 
 /* lone_philo_routine:
-*	This routine is invoked only when there is a single philosopher.
-*	A single philosopher has only one fork, so cannot eat. The
-*	philosopher will pick up that fork, wait as long as time_to_die then die.
-*/
+ *  Special case when only one philosopher exists.
+ *  - Takes one fork, waits until time_to_die, then dies.
+ */
 static void	*lone_philo_routine(t_philo *philo)
 {
 	pthread_mutex_lock(philo->left_fork);
@@ -65,27 +93,4 @@ static void	*lone_philo_routine(t_philo *philo)
 	print_status(philo, "died", 0);
 	pthread_mutex_unlock(philo->left_fork);
 	return (NULL);
-}
-
-void *philo_routine(void *arg)
-{
-	t_philo *philo;
-
-	philo = (t_philo *)arg;
-	if (!philo || !philo->data || !philo->data->meals_required || !philo->data->time_to_die)
-		return (NULL);
-	pthread_mutex_lock(&philo->meal_time_mutex);
-	philo->last_meal = philo->data->start_time;
-	pthread_mutex_unlock(&philo->meal_time_mutex);
-	start_delay(philo->data->start_time);
-	if (philo->data->num_philos == 1)
-		return (lone_philo_routine(philo));
-	else if (philo->id % 2)
-		think_routine(philo, 0);
-	while (!has_simulation_stopped(philo->data))
-	{
-		eat_sleep_routine(philo);
-		think_routine(philo, 1);
-	}
-    return (NULL);
 }

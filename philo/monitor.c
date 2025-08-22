@@ -1,10 +1,37 @@
 #include "philo.h"
 
+static int	is_philo_died(t_philo *philo);
+static int	philos_died_or_ate_enough(t_data *data);
+
+/* monitor_routine:
+ *  Main loop for the monitor thread.
+ *  Repeatedly checks if:
+ *   - A philosopher has died.
+ *   - All philosophers have eaten enough.
+ *  Ends simulation if either condition is true.
+ */
+void	*monitor_routine(void *arg)
+{
+	t_data	*data;
+
+	data = (t_data *)arg;
+	if (data->meals_required == 0)
+		return (NULL);
+	set_stop_flag(data, 0);
+	start_delay(data->start_time);
+	while (1)
+	{
+		if (philos_died_or_ate_enough(data))
+			return (NULL);
+		usleep(1000);
+	}
+	return (NULL);
+}
+
 /* set_stop_flag:
-*	Sets the simulation stop flag to 1 or 0. Only the monitor
-*	thread can set this flag. If the simulation stop flag is
-*	set to 1, that means the simulation has met an end condition.
-*/
+ *  Updates the stop flag (0 = running, 1 = stopped).
+ *  Only the monitor thread should set this flag.
+ */
 void	set_stop_flag(t_data *data, int state)
 {
 	pthread_mutex_lock(&data->death_mutex);
@@ -13,12 +40,10 @@ void	set_stop_flag(t_data *data, int state)
 }
 
 /* has_simulation_stopped:
-*	Checks if the simulation is at an end. The stop flag
-*	is protected by a mutex lock to allow any thread to check
-*	the simulation status without data race.
-*	Returns 1 if the simulation stop flag is set to 1,
-*	false if the flag is set to 0.
-*/
+ *  Checks if the stop flag is set.
+ *  Thread-safe with mutex protection.
+ *  Returns 1 if stopped, 0 if running.
+ */
 int	has_simulation_stopped(t_data *data)
 {
 	int	r;
@@ -32,12 +57,11 @@ int	has_simulation_stopped(t_data *data)
 }
 
 /* is_philo_died:
-*	Checks if the philosopher must be die by comparing the
-*	time since the philosopher's last meal and the time_to_die parameter.
-*	If it is time for the philosopher to die, sets the simulation stop
-*	flag and displays the death status.
-*	Returns 1 if the philosopher has been killed, 0 if not.
-*/
+ *  Checks if the philosopher has exceeded time_to_die
+ *  since their last meal.
+ *  If so, stop the simulation and print death status.
+ *  Returns 1 if dead, 0 otherwise.
+ */
 static int	is_philo_died(t_philo *philo)
 {
 	if ((get_time_ms() - philo->last_meal) >= philo->data->time_to_die)
@@ -51,11 +75,12 @@ static int	is_philo_died(t_philo *philo)
 }
 
 /* philos_died_or_ate_enough:
-*	Checks each philosopher to see if one of two end conditions
-*	has been reached. Stops the simulation if a philosopher needs
-*	to be die, or if every philosopher has eaten enough.
-*	Returns true if an end condition has been reached, false if not.
-*/
+ *  Loops through philosophers to check:
+ *   - If any philosopher died.
+ *   - If all philosophers ate required meals.
+ *  Stops simulation if either condition is met.
+ *  Returns 1 if simulation should end, 0 otherwise.
+ */
 static int	philos_died_or_ate_enough(t_data *data)
 {
 	int	i;
@@ -80,27 +105,4 @@ static int	philos_died_or_ate_enough(t_data *data)
 		return (1);
 	}
 	return (0);
-}
-
-/* monitor_routine:
-*	The monitor thread's routine. Checks if a philosopher must
-*	be die and if all philosophers ate enough. If one of those two
-*	end conditions are reached, it stops the simulation.
-*/
-void	*monitor_routine(void *arg)
-{
-	t_data	*data;
-
-	data = (t_data *)arg;
-	if (data->meals_required == 0)
-		return (NULL);
-	set_stop_flag(data, 0);
-	start_delay(data->start_time);
-	while (1)
-	{
-		if (philos_died_or_ate_enough(data))
-			return (NULL);
-		usleep(1000);
-	}
-	return (NULL);
 }
