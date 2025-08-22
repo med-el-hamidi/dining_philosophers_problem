@@ -1,10 +1,10 @@
-# Dining Philosophers 🥢
+# Dining Philosophers Problem
 
 > A pthreads + mutexes simulation of the classic Dining Philosophers problem, focusing on thread safety, deadlock avoidance, and precise timing.
 
 ![Language](https://img.shields.io/badge/C-pthread-blue)
 ![Build](https://img.shields.io/badge/build-make-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-lightgrey)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/med-el-hamidi/dining_philosophers_problem/blob/main/LICENSE.md)
 
 ---
 
