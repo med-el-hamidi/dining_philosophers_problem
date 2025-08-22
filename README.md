@@ -45,11 +45,11 @@ This project simulates philosophers (threads) sharing forks (mutexes). Philosoph
 ```bash
 make
 ```
-Usage
+Usage:
 ```bash
 ./philo number_of_philos time_to_die time_to_eat time_to_sleep [meals_required]
 ```
-Arguments
+Arguments:
 
 number_of_philos — number of philosophers (and forks)
 
@@ -63,7 +63,7 @@ meals_required (optional) — stop when each philosopher ate this many times
 
 Omit to run until a death occurs
 
-Examples
+Examples:
 ```bash
 # Run until someone dies
 ./philo 5 800 200 200
