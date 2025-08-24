@@ -14,18 +14,15 @@ static int	_is_unsignd_digit(char *str);
 int	custom_atoi(const char *str)
 {
 	unsigned long long	nbr;
-	long				tmp;
 
-	nbr = 0;
 	while ((*str >= 9 && *str <= 13) || *str == ' ')
 		str++;
 	if (*str == '+')
 		str++;
 	while (*str >= '0' && *str <= '9')
 	{
-		tmp = nbr;
 		nbr = (nbr * 10) + (*str++ - '0');
-		if (nbr > INT_MAX || (nbr / 10) != tmp)
+		if (nbr > INT_MAX)
 			return (-1);
 	}
 	return (nbr);
